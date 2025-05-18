@@ -61,6 +61,10 @@ Contributors:
 
 #include "framebuffer/common.hpp"
 
+#elif 1 //TODO HPM Detection
+
+#include "hpm/common.hpp"
+
 #else
 
 #error unknown platform...

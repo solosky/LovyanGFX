@@ -80,6 +80,9 @@ Contributors:
 
 #include "stm32/Bus_SPI.hpp"
 
+#elif 1 //TODO HPM Detection
+#include "hpm/Bus_SPI.hpp"
+
 #elif defined (ARDUINO_ARCH_SPRESENSE)
 
 #include "spresense/Bus_SPI.hpp"
