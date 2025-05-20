@@ -27,36 +27,24 @@ namespace lgfx
   void pinMode(int_fast16_t pin, pin_mode_t mode)
   {
     if (pin < 0) return;
-/*
-    switch (mode)
-    {
-    case pin_mode_t::output:
-      ::pinMode(pin, OUTPUT);
+
+    switch (mode) {
+    case pin_mode_t::input: /* INPUT_FLOATING */
+      gpio_set_pin_input(HPM_GPIO0, GPIO_GET_PORT_INDEX(pin), GPIO_GET_PIN_INDEX(pin));
+      HPM_IOC->PAD[pin].PAD_CTL = 0;
       break;
-    
-    default:
-      ::pinMode(pin, INPUT);
+    case pin_mode_t::input_pullup:
+      gpio_set_pin_input(HPM_GPIO0, GPIO_GET_PORT_INDEX(pin), GPIO_GET_PIN_INDEX(pin));
+      HPM_IOC->PAD[pin].PAD_CTL = IOC_PAD_PAD_CTL_PE_SET(1) | IOC_PAD_PAD_CTL_PS_SET(1);
+      break;
+    case pin_mode_t::input_pulldown:
+      gpio_set_pin_input(HPM_GPIO0, GPIO_GET_PORT_INDEX(pin), GPIO_GET_PIN_INDEX(pin));
+      HPM_IOC->PAD[pin].PAD_CTL = IOC_PAD_PAD_CTL_PE_SET(1);
+      break;
+    case pin_mode_t::output:
+      gpio_set_pin_output(HPM_GPIO0, GPIO_GET_PORT_INDEX(pin), GPIO_GET_PIN_INDEX(pin));
       break;
     }
-//*/
-    unsigned int pd = 0;
-
-    // switch (mode) {
-    // case pin_mode_t::input: /* INPUT_FLOATING */
-    //   pd = STM_PIN_DATA(STM_MODE_INPUT, GPIO_NOPULL, 0);
-    //   break;
-    // case pin_mode_t::input_pullup:
-    //   pd = STM_PIN_DATA(STM_MODE_INPUT, GPIO_PULLUP, 0);
-    //   break;
-    // case pin_mode_t::input_pulldown:
-    //   pd = STM_PIN_DATA(STM_MODE_INPUT, GPIO_PULLDOWN, 0);
-    //   break;
-    // case pin_mode_t::output:
-    //   pd = STM_PIN_DATA(STM_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
-    //   break;
-    // }
-
-    // pin_function((PinName)pin, pd);
   }
 
 //----------------------------------------------------------------------------

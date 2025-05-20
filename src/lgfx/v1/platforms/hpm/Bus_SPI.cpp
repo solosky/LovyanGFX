@@ -24,14 +24,6 @@ namespace lgfx
  inline namespace v1
  {
 //----------------------------------------------------------------------------
-//  static DMA_HandleTypeDef *dmaHal_single;
-  
-  extern "C" void DMA1_Stream4_IRQHandler();
-  void DMA1_Stream4_IRQHandler(void)
-  {
-    // Call the default end of buffer handler
-  //  HAL_DMA_IRQHandler(dmaHal_single);
-  }
 
   void Bus_SPI::config(const config_t& config)
   {
@@ -53,51 +45,7 @@ namespace lgfx
 
   bool Bus_SPI::init(void)
   {
-//     lgfx::pinMode(_cfg.pin_dc, pin_mode_t::output);
-
-//     dmaHal_single = &_dmaHal;
-
-//     //_spiHal.Init.
-
-//     _spiHal.Instance = _cfg.spi_port;
-//     if (_cfg.spi_port == SPI1)
-//     {
-//       __HAL_RCC_DMA2_CLK_ENABLE();                           // Enable DMA2 clock
-//       _dmaHal.Init.Channel = DMA_CHANNEL_3;                   // DMA channel 3 is for SPI1 TX
-//       _dmaHal.Instance = DMA2_Stream3;
-//     }
-//     else if (_cfg.spi_port == SPI2)
-//     {
-//       __HAL_RCC_DMA1_CLK_ENABLE();                           // Enable DMA2 clock
-//       _dmaHal.Init.Channel = DMA_CHANNEL_0;                   // DMA channel 0 is for SPI2 TX
-//       _dmaHal.Instance = DMA1_Stream4;
-//     }
-
-//     _dmaHal.Init.Mode =  DMA_NORMAL; //DMA_CIRCULAR;   //   // Normal = send buffer once
-//     _dmaHal.Init.Direction = DMA_MEMORY_TO_PERIPH;          // Copy memory to the peripheral
-//     _dmaHal.Init.PeriphInc = DMA_PINC_DISABLE;              // Don't increment peripheral address
-//     _dmaHal.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE; // Peripheral is byte aligned
-//     _dmaHal.Init.MemInc = DMA_MINC_ENABLE;                  // Increment memory address
-//     _dmaHal.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;    // Memory is byte aligned
-
-//     if (HAL_DMA_Init(&_dmaHal) != HAL_OK)
-//     {                  // Init DMA with settings
-//       // for (;;) {};
-//       // return; // error
-//     };
-
-//     if (_cfg.spi_port == SPI1)
-//     {
-//       HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);  // Enable DMA end interrupt handler
-//     }
-//     else if (_cfg.spi_port == SPI2)
-//     {
-//       HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);  // Enable DMA end interrupt handler
-//     }
-
-//     __HAL_LINKDMA(&_spiHal, hdmatx, _dmaHal);   // Attach DMA engine to SPI peripheral
-// //*/
-
+    lgfx::pinMode(_cfg.pin_dc, pin_mode_t::output);
     return true;
   }
 
