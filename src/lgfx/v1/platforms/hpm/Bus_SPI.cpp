@@ -18,6 +18,8 @@ Contributors:
 
 #include "Bus_SPI.hpp"
 #include "../../misc/pixelcopy.hpp"
+#include "hpm_spi.h"
+#include "hpm_dma_mgr.h"
 
 namespace lgfx
 {
@@ -27,25 +29,34 @@ namespace lgfx
 
   void Bus_SPI::config(const config_t& config)
   {
-    // _cfg = config;
-
-    // if (_cfg.pin_dc >= 0)
-    // {
-    //   _gpio_reg_dc = get_gpio_out_reg(_cfg.pin_dc);
-    //   _mask_reg_dc_h = 1ul <<  (_cfg.pin_dc & 0x0F);
-    //   _mask_reg_dc_l = 1ul << ((_cfg.pin_dc & 0x0F)+16);
-    // }
-    // else
-    // {
-    //   _gpio_reg_dc = get_gpio_out_reg(0);
-    //   _mask_reg_dc_h = 0;
-    //   _mask_reg_dc_l = 0;
-    // }
+    _cfg = config;
   }
 
   bool Bus_SPI::init(void)
   {
     lgfx::pinMode(_cfg.pin_dc, pin_mode_t::output);
+
+    spi_initialize_config_t init_config;
+
+    //board_init_spi_clock(TEST_SPI);
+    /* pins init*/
+    //board_init_spi_pins_with_gpio_as_cs(TEST_SPI);
+    dma_mgr_init();
+    hpm_spi_get_default_init_config(&init_config);
+    init_config.mode = spi_master_mode;
+    init_config.clk_phase = spi_sclk_sampling_odd_clk_edges;
+    init_config.clk_polarity = spi_sclk_low_idle;
+    init_config.data_len = 8;
+    /* step.1  initialize spi */
+    if (hpm_spi_initialize(_cfg.spi_type, &init_config) != status_success) {
+        printf("hpm_spi_initialize fail\n");
+        return false;
+    }
+    /* step.2  set spi sclk frequency for master */
+    if (hpm_spi_set_sclk_frequency(_cfg.spi_type, _cfg.freq_write) != status_success) {
+        printf("hpm_spi_set_sclk_frequency fail\n");
+        return false;
+    }
     return true;
   }
 
@@ -85,22 +96,17 @@ namespace lgfx
 
   bool Bus_SPI::busy(void) const
   {
-    return false; //_cfg.spi_port->SR  & SPI_SR_BSY;
+    return spi_is_active(_cfg.spi_type);
   }
 
   bool Bus_SPI::writeCommand(uint32_t data, uint_fast8_t bit_length)
   {
-    // if (0 == (bit_length >>= 3)) { return true; }
-    // auto spidr = reinterpret_cast<volatile uint8_t*>(&_cfg.spi_port->DR);
-    // auto spisr = &_cfg.spi_port->SR;
+    // if( 0 == (bit_length >> 3)) {return true;}
     // dc_control(false);
-    // *spidr = data;
-    // while (--bit_length)
-    // {
-    //   data >>= 8;
-    //   do {} while (!(*spisr & sr_mask));
-    //   *spidr = data;
+    // if(hpm_spi_transmit_blocking(_cfg.spi_type, data, bit_length >> 3, 200) != status_success){
+    //   return false;
     // }
+    printf("writeCommand: not implemented");
     return true;
   }
 
@@ -117,6 +123,7 @@ namespace lgfx
     //   do {} while (!(*spisr & sr_mask));
     //   *spidr = data;
     // }
+    printf("writeData: not implemented");
   }
 
   void Bus_SPI::writeDataRepeat(uint32_t data, uint_fast8_t bit_length, uint32_t length)
@@ -200,20 +207,10 @@ namespace lgfx
 
   void Bus_SPI::writeBytes(const uint8_t* data, uint32_t length, bool dc, bool use_dma)
   {
-    // dc_control(dc);
-
-    // if (length < 16)
-    // {
-    //   SPI.transfer(const_cast<uint8_t*>(data), length);
-    //   return;
-    // }
-    // _spiHal.State = HAL_SPI_STATE_READY;
-    // while (length > 0xFFFF)
-    // {
-    //   HAL_SPI_Transmit(&_spiHal, (uint8_t*)data, 0x1000, HAL_MAX_DELAY);
-    //   length -= 0x1000; data += 0x1000;
-    // }
-    // HAL_SPI_Transmit_DMA(&_spiHal, (uint8_t*)data, length);
+    dc_control(dc);
+    if(hpm_spi_transmit_blocking(_cfg.spi_type, (uint8_t*)data, length, 200) != status_success){
+      printf("writeBytes failed\n");
+    }
   }
 
   uint32_t Bus_SPI::readData(uint_fast8_t bit_length)
@@ -232,11 +229,10 @@ namespace lgfx
 
   bool Bus_SPI::readBytes(uint8_t* dst, uint32_t length, bool use_dma)
   {
-    // do
-    // {
-    //   dst[0] = SPI.transfer(0);
-    //   ++dst;
-    // } while (--length);
+    if(hpm_spi_receive_blocking(_cfg.spi_type, dst, length, 200) != status_success){
+      printf("readBytes failed\n");
+      return false;
+    }
     return true;
   }
 

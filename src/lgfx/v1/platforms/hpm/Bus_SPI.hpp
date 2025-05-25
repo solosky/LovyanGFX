@@ -23,6 +23,8 @@ Contributors:
 #include "../../Bus.hpp"
 #include "../common.hpp"
 
+#include "hpm_spi_drv.h"
+
 namespace lgfx
 {
  inline namespace v1
@@ -40,6 +42,9 @@ namespace lgfx
       int16_t pin_mosi = -1;
       int16_t pin_dc   = -1;
       uint8_t spi_mode = 0;
+      uint32_t freq_write = 16000000;
+      uint32_t freq_read  =  8000000;
+      SPI_Type* spi_type = HPM_SPI0;
     };
 
     const config_t& config(void) const { return _cfg; }
@@ -78,8 +83,7 @@ namespace lgfx
 
     __attribute__ ((always_inline)) inline void wait_spi(void)
     {
-      // volatile uint32_t *spisr = &_cfg.spi_port->SR;
-      // do {} while (*spisr & SPI_SR_BSY);
+      while(spi_wait_for_idle_status(_cfg.spi_type) != status_success){}      
     }
 
     __attribute__ ((always_inline)) inline void dc_control(bool flg)
@@ -96,6 +100,6 @@ namespace lgfx
     FlipBuffer _flip_buffer;
   };
 
-//----------------------------------------------------------------------------
+ //----------------------------------------------------------------------------
  }
 }
