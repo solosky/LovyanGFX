@@ -37,9 +37,9 @@ namespace lgfx
     struct config_t
     {
       uint32_t freq = 16000000;
-      int16_t pin_sclk = -1;
-      int16_t pin_miso = -1;
-      int16_t pin_mosi = -1;
+      // int16_t pin_sclk = -1;
+      // int16_t pin_miso = -1;
+      // int16_t pin_mosi = -1;
       int16_t pin_dc   = -1;
       uint8_t spi_mode = 0;
       uint32_t freq_write = 16000000;
@@ -88,13 +88,7 @@ namespace lgfx
 
     __attribute__ ((always_inline)) inline void dc_control(bool flg)
     {
-      // auto gpio_reg_dc = _gpio_reg_dc;
-      // auto mask_reg_dc = flg ? _mask_reg_dc_h : _mask_reg_dc_l;
-      // volatile uint32_t *spisr = &_cfg.spi_port->SR;
-      // do {} while (*spisr & SPI_SR_BSY);
-      // *gpio_reg_dc = mask_reg_dc;
       gpio_write(_cfg.pin_dc, flg);
-
     }
     config_t _cfg;
     FlipBuffer _flip_buffer;
